@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Generador de enlaces de WhatsApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.min.js"></script>
+  </head>
+  <body>
+    <h1>Generador de enlaces de WhatsApp</h1>
+    <label for="phone">Número de teléfono (en formato internacional):</label>
+    <input type="text" id="phone"><br>
+    <label for="message">Mensaje:</label>
+    <textarea id="message"></textarea><br>
+    <button onclick="generateLink()">Generar enlace y código QR</button><br>
+    <div id="qr"></div>
+    <script>
+      function generateLink() {
+        // Obtener los valores de los campos de entrada
+        var phone = document.getElementById("phone").value;
+        var message = document.getElementById("message").value;
+
+        // Combinar el número de teléfono y el mensaje en una URL codificada con la codificación URL
+        var urlencodedtext = encodeURIComponent(message);
+        var url = "https://wa.me/" + phone + "?text=" + urlencodedtext;
+
+        // Generar el código QR de la URL
+        var qr = qrcode(0, "M");
+        qr.addData(url);
+        qr.make();
+
+        // Insertar el código QR en la página
+        var qrElement = document.getElementById("qr");
+        qrElement.innerHTML = qr.createImgTag();
+      }
+    </script>
+  </body>
+</html>
