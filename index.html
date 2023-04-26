@@ -13,6 +13,7 @@
     <textarea id="message"></textarea><br>
     <button onclick="generateLink()">Generar enlace y código QR</button><br>
     <div id="qr"></div>
+    <div id="url"></div>
     <script>
       function generateLink() {
         // Obtener los valores de los campos de entrada
@@ -28,9 +29,13 @@
         qr.addData(url);
         qr.make();
 
-        // Insertar el código QR en la página
+        // Insertar el código QR en la página con un tamaño mínimo de 300x300 píxeles
         var qrElement = document.getElementById("qr");
-        qrElement.innerHTML = qr.createImgTag();
+        qrElement.innerHTML = qr.createImgTag(4, 10);
+
+        // Mostrar la URL generada
+        var urlElement = document.getElementById("url");
+        urlElement.innerHTML = "<p>URL generada: <a href='" + url + "' target='_blank'>" + url + "</a></p>";
       }
     </script>
   </body>
