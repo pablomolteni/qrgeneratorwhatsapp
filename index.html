@@ -7,10 +7,14 @@
   </head>
   <body>
     <h1>Generador de enlaces de WhatsApp</h1>
-    <label for="phone">Número de teléfono (en formato internacional):</label>
+    <label for="phone">Ingrese el número de teléfono de su bot en formato internacional:</label>
+    <br>
     <input type="text" id="phone"><br>
-    <label for="message">Mensaje:</label>
+    <hr>
+    <label for="message">Indique el mensaje por defecto que aparecerá al usuario para enviar</label>
+    <br>
     <textarea id="message"></textarea><br>
+    <hr>
     <button onclick="generateLink()">Generar enlace y código QR</button><br>
     <div id="qr"></div>
     <div id="url"></div>
