@@ -1,46 +1,346 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <title>Generador de enlaces de WhatsApp</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.min.js"></script>
-  </head>
-  <body>
-    <h1>Generador de enlaces de WhatsApp</h1>
-    <label for="phone">Ingrese el número de teléfono de su bot en formato internacional:</label>
-    <br>
-    <input type="text" id="phone"><br>
-    <hr>
-    <label for="message">Indique el mensaje por defecto que aparecerá al usuario para enviar</label>
-    <br>
-    <textarea id="message"></textarea><br>
-    <hr>
-    <button onclick="generateLink()">Generar enlace y código QR</button><br>
-    <div id="qr"></div>
-    <div id="url"></div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #25d366;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #25d366;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #25d366, #20b358);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(37, 211, 102, 0.3);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .output-section {
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .qr-container {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+        }
+
+        #qrcode {
+            display: inline-block;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        .url-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            margin-top: 20px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            line-height: 1.4;
+        }
+
+        .url-label {
+            font-weight: 600;
+            color: #343a40;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .placeholder-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔗 WhatsApp QR Generator</h1>
+            <p>Create QR codes for WhatsApp chats instantly</p>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+
+        <form id="qr-form">
+            <div class="input-group">
+                <label for="phone">Phone Number (International Format)</label>
+                <input type="tel" id="phone" placeholder="+1234567890" required>
+                <div class="placeholder-text">Include country code (e.g., +1 for US, +44 for UK)</div>
+            </div>
+
+            <div class="input-group">
+                <label for="message">Pre-filled Message (Optional)</label>
+                <textarea id="message" placeholder="Hello! I found you through your QR code..."></textarea>
+                <div class="placeholder-text">This message will appear when someone scans the QR code</div>
+            </div>
+
+            <button type="submit" class="generate-btn">Generate QR Code</button>
+        </form>
+
+        <div id="output" class="output-section">
+            <div class="qr-container">
+                <div id="qrcode"></div>
+                <button id="download-btn" class="download-btn">📥 Download QR</button>
+            </div>
+            
+            <div class="url-label">WhatsApp URL:</div>
+            <div id="url-display" class="url-display"></div>
+        </div>
+    </div>
+
     <script>
-      function generateLink() {
-        // Obtener los valores de los campos de entrada
-        var phone = document.getElementById("phone").value;
-        var message = document.getElementById("message").value;
+        let currentQRCode = null;
+        let currentWhatsAppURL = '';
 
-        // Combinar el número de teléfono y el mensaje en una URL codificada con la codificación URL
-        var urlencodedtext = encodeURIComponent(message);
-        var url = "https://wa.me/" + phone + "?text=" + urlencodedtext;
+        document.getElementById('qr-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateQRCode();
+        });
 
-        // Generar el código QR de la URL
-        var qr = qrcode(0, "M");
-        qr.addData(url);
-        qr.make();
+        function generateQRCode() {
+            const phone = document.getElementById('phone').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const errorDiv = document.getElementById('error-message');
+            
+            // Clear previous errors
+            errorDiv.style.display = 'none';
+            
+            // Validate phone number
+            if (!phone) {
+                showError('Please enter a phone number');
+                return;
+            }
+            
+            // Clean phone number (remove spaces, dashes, etc.)
+            const cleanPhone = phone.replace(/[^\d+]/g, '');
+            
+            if (!cleanPhone.startsWith('+')) {
+                showError('Phone number must start with + followed by country code');
+                return;
+            }
+            
+            if (cleanPhone.length < 8) {
+                showError('Phone number seems too short');
+                return;
+            }
+            
+            // Create WhatsApp URL
+            currentWhatsAppURL = `https://wa.me/${cleanPhone.substring(1)}`;
+            if (message) {
+                currentWhatsAppURL += `?text=${encodeURIComponent(message)}`;
+            }
+            
+            // Clear previous QR code
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generate new QR code
+            QRCode.toCanvas(document.getElementById('qrcode'), currentWhatsAppURL, {
+                width: 256,
+                height: 256,
+                color: {
+                    dark: '#25d366',
+                    light: '#ffffff'
+                },
+                errorCorrectionLevel: 'M',
+                margin: 2
+            }, function (error, canvas) {
+                if (error) {
+                    showError('Error generating QR code: ' + error.message);
+                    return;
+                }
+                
+                currentQRCode = canvas;
+                
+                // Show output section
+                document.getElementById('output').classList.add('show');
+                document.getElementById('url-display').textContent = currentWhatsAppURL;
+                
+                // Scroll to output
+                document.getElementById('output').scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+            });
+        }
 
-        // Insertar el código QR en la página con un tamaño mínimo de 300x300 píxeles
-        var qrElement = document.getElementById("qr");
-        qrElement.innerHTML = qr.createImgTag(4, 10);
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
 
-        // Mostrar la URL generada
-        var urlElement = document.getElementById("url");
-        urlElement.innerHTML = "<p>URL generada: <a href='" + url + "' target='_blank'>" + url + "</a></p>";
-      }
+        document.getElementById('download-btn').addEventListener('click', function() {
+            if (!currentQRCode) {
+                showError('No QR code to download');
+                return;
+            }
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `whatsapp-qr-${Date.now()}.png`;
+            link.href = currentQRCode.toDataURL('image/png');
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Auto-format phone number input
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value;
+            if (value && !value.startsWith('+')) {
+                e.target.value = '+' + value;
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
