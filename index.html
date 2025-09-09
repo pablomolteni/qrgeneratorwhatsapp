@@ -1,46 +1,78 @@
 <!DOCTYPE html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <title>Generador de enlaces de WhatsApp</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.min.js"></script>
-  </head>
-  <body>
-    <h1>Generador de enlaces de WhatsApp</h1>
-    <label for="phone">Ingrese el número de teléfono de su bot en formato internacional:</label>
-    <br>
-    <input type="text" id="phone"><br>
-    <hr>
-    <label for="message">Indique el mensaje por defecto que aparecerá al usuario para enviar</label>
-    <br>
-    <textarea id="message"></textarea><br>
-    <hr>
-    <button onclick="generateLink()">Generar enlace y código QR</button><br>
-    <div id="qr"></div>
-    <div id="url"></div>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #128C7E;
+        }
+        #qrcode {
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>WhatsApp QR Code Generator</h1>
+    <p>Enter the phone number in full international format (e.g., 15551234567 without + or spaces).</p>
+    <input type="text" id="phone" placeholder="Phone Number (e.g., 15551234567)" required>
+    
+    <p>Enter the preloaded text message.</p>
+    <textarea id="message" placeholder="Preloaded Message" rows="4" required></textarea>
+    
+    <button onclick="generateQR()">Generate QR</button>
+    
+    <div id="qrcode"></div>
+
     <script>
-      function generateLink() {
-        // Obtener los valores de los campos de entrada
-        var phone = document.getElementById("phone").value;
-        var message = document.getElementById("message").value;
-
-        // Combinar el número de teléfono y el mensaje en una URL codificada con la codificación URL
-        var urlencodedtext = encodeURIComponent(message);
-        var url = "https://wa.me/" + phone + "?text=" + urlencodedtext;
-
-        // Generar el código QR de la URL
-        var qr = qrcode(0, "M");
-        qr.addData(url);
-        qr.make();
-
-        // Insertar el código QR en la página con un tamaño mínimo de 300x300 píxeles
-        var qrElement = document.getElementById("qr");
-        qrElement.innerHTML = qr.createImgTag(4, 10);
-
-        // Mostrar la URL generada
-        var urlElement = document.getElementById("url");
-        urlElement.innerHTML = "<p>URL generada: <a href='" + url + "' target='_blank'>" + url + "</a></p>";
-      }
+        function generateQR() {
+            const phone = document.getElementById('phone').value.trim();
+            const message = encodeURIComponent(document.getElementById('message').value.trim());
+            
+            if (!phone || !message) {
+                alert('Please enter both phone number and message.');
+                return;
+            }
+            
+            const url = `https://wa.me/${phone}?text=${message}`;
+            
+            // Clear previous QR code
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generate new QR code
+            new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 256,
+                height: 256,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
     </script>
-  </body>
+</body>
 </html>
